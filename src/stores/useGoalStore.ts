@@ -83,8 +83,8 @@ export const useGoalStore = create<GoalState>((set, get) => ({
           { id: 'm_9', goalId: 'goal_projects', title: 'Launch Production Build', completed: false },
         ];
 
-        await db.goals.bulkAdd(sampleGoals);
-        await db.milestones.bulkAdd(sampleMilestones);
+        await db.goals.bulkPut(sampleGoals);
+        await db.milestones.bulkPut(sampleMilestones);
         set({ goals: sampleGoals, milestones: sampleMilestones, isLoading: false });
         return;
       }
@@ -117,7 +117,7 @@ export const useGoalStore = create<GoalState>((set, get) => ({
 
     await db.goals.add(newGoal);
     if (newMilestones.length > 0) {
-      await db.milestones.bulkAdd(newMilestones);
+      await db.milestones.bulkPut(newMilestones);
     }
 
     set((state) => ({

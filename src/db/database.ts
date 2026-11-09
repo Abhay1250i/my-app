@@ -1,5 +1,6 @@
 import { OnePercentDatabase } from './schema';
-import type { Habit, Reward } from '@/types';
+import type { Habit, Reward, Task } from '@/types';
+import { getLocalDateString } from '@/lib/dateUtils';
 
 export const db = new OnePercentDatabase();
 
@@ -213,7 +214,7 @@ export async function initializeDatabase(): Promise<void> {
       createdAt: now,
       updatedAt: now,
     }));
-    await db.habits.bulkAdd(habitsToInsert);
+    await db.habits.bulkPut(habitsToInsert);
   }
 
   const rewardCount = await db.rewards.count();
@@ -223,7 +224,39 @@ export async function initializeDatabase(): Promise<void> {
       id: `reward_default_${index + 1}`,
       createdAt: now,
     }));
-    await db.rewards.bulkAdd(rewardsToInsert);
+    await db.rewards.bulkPut(rewardsToInsert);
+  }
+
+  const taskCount = await db.tasks.count();
+  if (taskCount === 0) {
+    const todayStr = getLocalDateString(new Date());
+    const sampleTasks: Task[] = [
+      {
+        id: 'task_default_1',
+        title: 'Finish project proposal',
+        description: 'Review architecture and submit final proposal deck',
+        dueDate: todayStr,
+        dueTime: '10:00 AM',
+        priority: 'high',
+        category: 'Work',
+        completed: false,
+        order: 1,
+        createdAt: now,
+      },
+      {
+        id: 'task_default_2',
+        title: 'Review Q3 metrics',
+        description: 'Check team velocity, metrics, and targets',
+        dueDate: todayStr,
+        dueTime: '02:00 PM',
+        priority: 'medium',
+        category: 'Analytics',
+        completed: false,
+        order: 2,
+        createdAt: now,
+      },
+    ];
+    await db.tasks.bulkPut(sampleTasks);
   }
 
   // Ensure default preferences
